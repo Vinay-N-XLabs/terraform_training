@@ -1,0 +1,10 @@
+resource "aws_instance" "ubuntu" {
+  ami           = var.ami
+  instance_type = var.instance_type
+  key_name      = var.key_name
+  
+  count         = var.instance_count
+  vpc_security_group_ids = [var.ssh_security_group_id]
+
+  tags = var.tags
+}

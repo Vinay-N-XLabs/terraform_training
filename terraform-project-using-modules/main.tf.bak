@@ -1,0 +1,38 @@
+provider "aws" {
+	region="ap-south-1"
+}
+
+terraform {
+  backend "s3" {
+    bucket         = "terrafrombuk" 
+    key            = "terraform/state"            
+    region         = "ap-south-1"                
+  }
+}
+module "rds" {
+  source                  = "./modules/rds"
+  db_instance_identifier  = "my-rds-instance"
+  engine                 = "mysql"                     
+  engine_version         = "8.0"                       
+  instance_class         = "db.t1.micro"               
+  allocated_storage       = 10                          
+  db_name                = "mydatabase"                 
+  username               = "terrafrom"                     
+  password               = "password"               
+  publicly_accessible     = false                
+  tags = {
+    Environment = "dev"
+    Project     = "my-project"
+  }
+}
+module "vpc" {
+  source		="./modules/vpc"
+}
+module "ec2" {
+  source                   = "./modules/ec2"
+ # ami_id                   = var.ami_id  
+ # instance_type            = var.instance_type
+  key_name                 = "MyKeyPair" 
+#  subnet_id                = module.vpc.public_subnet_id  
+  ssh_security_group_id    = module.vpc.security_group_id
+}
